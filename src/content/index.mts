@@ -4,3 +4,4 @@
  */
 
 export type * from '#content/directory'
+export type * from '#content/node'
