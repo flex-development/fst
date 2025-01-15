@@ -6,6 +6,7 @@
 import type * as TestSubject from '#nodes/directory'
 import type {
   Data,
+  DirectoryContent,
   Parent
 } from '@flex-development/fst'
 import type { Optional } from '@flex-development/tutils'
@@ -16,6 +17,12 @@ describe('unit-d:nodes/Directory', () => {
 
   it('should extend Parent', () => {
     expectTypeOf<Subject>().toMatchTypeOf<Parent>()
+  })
+
+  it('should match [children: DirectoryContent[]]', () => {
+    expectTypeOf<Subject>()
+      .toHaveProperty('children')
+      .toEqualTypeOf<DirectoryContent[]>()
   })
 
   it('should match [data?: DirectoryData | undefined]', () => {

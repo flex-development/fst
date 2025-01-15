@@ -23,6 +23,7 @@ It implements the [**unist**][unist] spec.
 - [Types](#types)
 - [Nodes (abstract)](#nodes-abstract)
 - [Nodes](#nodes)
+- [Content model](#content-model)
 - [Glossary](#glossary)
 - [List of utilities](#list-of-utilities)
 - [Contribute](#contribute)
@@ -46,6 +47,10 @@ yarn add @flex-development/fst
 ## Nodes
 
 **TODO**: nodes
+
+## Content model
+
+**TODO**: content model
 
 ## Glossary
 

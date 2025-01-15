@@ -4,7 +4,11 @@
  */
 
 import type * as TestSubject from '#nodes/root'
-import type { Data, Directory, File, Parent } from '@flex-development/fst'
+import type {
+  DirectoryContent,
+  DirectoryData,
+  Parent
+} from '@flex-development/fst'
 import type { Optional } from '@flex-development/tutils'
 
 describe('unit-d:nodes/Root', () => {
@@ -15,10 +19,10 @@ describe('unit-d:nodes/Root', () => {
     expectTypeOf<Subject>().toMatchTypeOf<Parent>()
   })
 
-  it('should match [children: (Directory | File)[]]', () => {
+  it('should match [children: DirectoryContent[]]', () => {
     expectTypeOf<Subject>()
       .toHaveProperty('children')
-      .toEqualTypeOf<(Directory | File)[]>()
+      .toEqualTypeOf<DirectoryContent[]>()
   })
 
   it('should match [data?: RootData | undefined]', () => {
@@ -36,8 +40,8 @@ describe('unit-d:nodes/Root', () => {
   })
 
   describe('RootData', () => {
-    it('should extend Data', () => {
-      expectTypeOf<SubjectData>().toMatchTypeOf<Data>()
+    it('should extend DirectoryData', () => {
+      expectTypeOf<SubjectData>().toMatchTypeOf<DirectoryData>()
     })
   })
 })

@@ -3,7 +3,7 @@
  * @module fst/nodes/Directory
  */
 
-import type { Data, File, Parent } from '@flex-development/fst'
+import type { Data, DirectoryContent, Parent } from '@flex-development/fst'
 
 /**
  * Info associated with directories.
@@ -25,9 +25,9 @@ interface Directory extends Parent {
   /**
    * List of children.
    *
-   * @see {@linkcode File}
+   * @see {@linkcode DirectoryContent}
    */
-  children: (Directory | File)[]
+  children: DirectoryContent[]
 
   /**
    * Info from the ecosystem.

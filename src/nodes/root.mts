@@ -4,9 +4,8 @@
  */
 
 import type {
-  Directory,
+  DirectoryContent,
   DirectoryData,
-  File,
   Parent
 } from '@flex-development/fst'
 
@@ -30,10 +29,9 @@ interface Root extends Parent {
   /**
    * List of children.
    *
-   * @see {@linkcode Directory}
-   * @see {@linkcode File}
+   * @see {@linkcode DirectoryContent}
    */
-  children: (Directory | File)[]
+  children: DirectoryContent[]
 
   /**
    * Info from the ecosystem.
