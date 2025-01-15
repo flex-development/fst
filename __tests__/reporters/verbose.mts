@@ -6,9 +6,8 @@
 
 import type { Task, TaskResultPack } from '@vitest/runner'
 import { getNames, getTests } from '@vitest/runner/utils'
-import { performance } from 'node:perf_hooks'
 import colors, { type Colors } from 'tinyrainbow'
-import type { RunnerTask, Vitest } from 'vitest'
+import type { RunnerTask, RunnerTestFile } from 'vitest'
 import { DefaultReporter, type Reporter } from 'vitest/reporters'
 
 /**
@@ -34,7 +33,8 @@ class VerboseReporter extends DefaultReporter implements Reporter {
    * Create a new verbose reporter.
    */
   constructor() {
-    super({ summary: false })
+    super({ summary: true })
+
     this.colors = colors
     this.renderSucceed = true
     this.verbose = true
@@ -98,33 +98,26 @@ class VerboseReporter extends DefaultReporter implements Reporter {
   }
 
   /**
-   * Capture end time once all tests have finished running.
+   * Print tasks.
+   *
+   * @see {@linkcode RunnerTestFile}
    *
    * @public
    * @override
    * @instance
    *
+   * @param {RunnerTestFile[] | undefined} [files]
+   *  List of test files
+   * @param {unknown[] | undefined} [errors]
+   *  List of unhandled errors
    * @return {undefined}
    */
-  public override onFinished(): undefined {
-    return void (this.end = performance.now())
-  }
-
-  /**
-   * Initialize the reporter.
-   *
-   * @see {@linkcode Vitest}
-   *
-   * @public
-   * @override
-   * @instance
-   *
-   * @param {Vitest} ctx
-   *  Vitest context
-   * @return {undefined}
-   */
-  public override onInit(ctx: Vitest): undefined {
-    return void (this.ctx = ctx, this.start = performance.now())
+  public override onFinished(
+    files?: RunnerTestFile[] | undefined,
+    errors?: unknown[] | undefined
+  ): undefined {
+    if (files) { for (const task of files) this.printTask(task, true) }
+    return void super.onFinished(files, errors)
   }
 
   /**
