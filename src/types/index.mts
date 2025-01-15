@@ -3,4 +3,5 @@
  * @module fst/types
  */
 
-export type {}
+export type { default as AnyParent } from '#types/any-parent'
+export type { default as Child } from '#types/child'
