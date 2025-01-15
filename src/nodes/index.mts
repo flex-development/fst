@@ -4,4 +4,5 @@
  * @see https://github.com/syntax-tree/unist#nodes
  */
 
-export type {}
+export type { default as Literal } from '#nodes/literal'
+export type { default as Node } from '#nodes/node'

@@ -47,6 +47,11 @@
     "./package.json": "./package.json"
   },
   "imports": {
+    "#interfaces/*": {
+      "fst": "./src/interfaces/*.mts",
+      "types": "./dist/interfaces/*.d.mts",
+      "default": "./dist/interfaces/*.d.mts"
+    },
     "#nodes/*": {
       "fst": "./src/nodes/*.mts",
       "types": "./dist/nodes/*.d.mts",
