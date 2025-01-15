@@ -1,217 +1,187 @@
 /**
- * @file Reporters - VerboseReporter
- * @module tests/reporters/VerboseReporter
+ * @file Reporters - Notifier
+ * @module tests/reporters/Notifier
  * @see https://vitest.dev/advanced/reporters#exported-reporters
  */
 
-import type { Task, TaskResultPack } from '@vitest/runner'
-import { getNames, getTests } from '@vitest/runner/utils'
-import colors, { type Colors } from 'tinyrainbow'
-import type { RunnerTask, RunnerTestFile } from 'vitest'
-import { DefaultReporter, type Reporter } from 'vitest/reporters'
+import type { Test } from '@vitest/runner'
+import { getTests } from '@vitest/runner/utils'
+import ci from 'is-ci'
+import notifier from 'node-notifier'
+import type { Notification } from 'node-notifier/notifiers/notificationcenter'
+import { performance } from 'node:perf_hooks'
+import { promisify } from 'node:util'
+import { dedent } from 'ts-dedent'
+import type { RunnerTestFile } from 'vitest'
+import type { Vitest } from 'vitest/node'
+import type { Reporter } from 'vitest/reporters'
 
 /**
- * Verbose reporter.
+ * Test report summary notifier.
  *
- * @see {@linkcode DefaultReporter}
  * @see {@linkcode Reporter}
  *
- * @extends {DefaultReporter}
  * @implements {Reporter}
  */
-class VerboseReporter extends DefaultReporter implements Reporter {
+class Notifier implements Reporter {
   /**
-   * Color functions map.
+   * Reporter context.
+   *
+   * @see {@linkcode Vitest}
    *
    * @public
    * @instance
-   * @member {Colors} colors
+   * @member {Vitest} ctx
    */
-  public colors: Colors
+  public ctx!: Vitest
 
   /**
-   * Create a new verbose reporter.
-   */
-  constructor() {
-    super({ summary: true })
-
-    this.colors = colors
-    this.renderSucceed = true
-    this.verbose = true
-  }
-
-  /**
-   * Format a project `name`.
+   * Test run end time (in milliseconds).
    *
-   * @protected
+   * @public
    * @instance
-   *
-   * @param {string | null | undefined} name
-   *  The project name to format
-   * @param {boolean | null | undefined} dim
-   *  Dim formattted project name?
-   * @return {string}
-   *  Formatted project name
+   * @member {number} end
    */
-  protected formatProjectName(
-    name: string | null | undefined,
-    dim?: boolean | null | undefined
-  ): string {
-    if (name) {
-      name = this.colors.magenta(`[${name}]`)
-      if (dim) name = this.colors.dim(name)
-      return name
-    }
-
-    return ''
-  }
+  public end!: number
 
   /**
-   * Get a symbol representing `task`.
+   * Test run start time (in milliseconds).
    *
-   * @see {@linkcode RunnerTask}
-   *
-   * @protected
+   * @public
    * @instance
-   *
-   * @param {RunnerTask} task
-   *  The runner task to handle
-   * @return {string}
-   *  Task state symbol
+   * @member {number} start
    */
-  protected getTaskSymbol(task: RunnerTask): string {
-    if (task.mode === 'skip') return this.colors.dim(this.colors.gray('↓'))
-
-    if (task.mode === 'todo') return this.colors.yellow('→')
-
-    if (!task.result) return this.colors.gray('.')
-
-    if (task.result.state === 'pass') {
-      return this.colors.green(task.meta.benchmark ? '·' : '✓')
-    }
-
-    if (task.result.state === 'fail') {
-      return this.colors.red(task.type === 'suite' ? '❯' : '✖')
-    }
-
-    return ''
-  }
+  public start!: number
 
   /**
-   * Print tasks.
+   * Send a notification after all tests have ran (in non ci/cd environments).
    *
    * @see {@linkcode RunnerTestFile}
    *
    * @public
-   * @override
    * @instance
    *
-   * @param {RunnerTestFile[] | undefined} [files]
+   * @async
+   *
+   * @param {RunnerTestFile[] | undefined} [files=this.ctx.state.getFiles()]
    *  List of test files
-   * @param {unknown[] | undefined} [errors]
+   * @param {unknown[] | undefined} [errors=this.ctx.state.getUnhandledErrors()]
    *  List of unhandled errors
    * @return {undefined}
    */
-  public override onFinished(
-    files?: RunnerTestFile[] | undefined,
-    errors?: unknown[] | undefined
-  ): undefined {
-    if (files) { for (const task of files) this.printTask(task, true) }
-    return void super.onFinished(files, errors)
+  public async onFinished(
+    files: RunnerTestFile[] = this.ctx.state.getFiles(),
+    errors: unknown[] = this.ctx.state.getUnhandledErrors()
+  ): Promise<undefined> {
+    this.end = performance.now()
+    return void await (ci || this.reportSummary(files, errors))
   }
 
   /**
-   * Handle task updates.
+   * Initialize the reporter.
    *
-   * @see {@linkcode TaskResultPack}
+   * @see {@linkcode Vitest}
    *
    * @public
-   * @override
    * @instance
    *
-   * @param {TaskResultPack[]} packs
-   *  List of task result packs
+   * @param {Vitest} ctx
+   *  Reporter context
    * @return {undefined}
    */
-  public override onTaskUpdate(packs: TaskResultPack[]): undefined {
-    return void (this.isTTY && void super.onTaskUpdate(packs))
+  public onInit(ctx: Vitest): undefined {
+    return void (this.ctx = ctx, this.start = performance.now())
   }
 
   /**
-   * Print `task`.
+   * Send a notification.
    *
-   * @see {@linkcode Task}
+   * @see {@linkcode RunnerTestFile}
    *
-   * @protected
-   * @override
+   * @public
    * @instance
    *
-   * @param {Task | null | undefined} task
-   *  The task to handle
-   * @param {boolean | null | undefined} [force]
-   *  Print `task` even when {@linkcode isTTY} is `false`?
-   * @return {undefined}
+   * @async
+   *
+   * @param {RunnerTestFile[] | undefined} [files=this.ctx.state.getFiles()]
+   *  List of test files
+   * @param {unknown[] | undefined} [errors=this.ctx.state.getUnhandledErrors()]
+   *  List of unhandled errors
+   * @return {Promise<undefined>}
    */
-  protected override printTask(
-    task: Task | null | undefined,
-    force?: boolean | null | undefined
-  ): undefined {
-    if (
-      (!this.isTTY || force) &&
-      task?.result?.state &&
-      task.result.state !== 'queued' &&
-      task.result.state !== 'run'
-    ) {
+  public async reportSummary(
+    files: RunnerTestFile[] = this.ctx.state.getFiles(),
+    errors: unknown[] = this.ctx.state.getUnhandledErrors()
+  ): Promise<undefined> {
+    /**
+     * Tests that have been run.
+     *
+     * @const {Test[]} tests
+     */
+    const tests: Test[] = getTests(files)
+
+    /**
+     * Total number of failed tests.
+     *
+     * @const {number} fails
+     */
+    const fails: number = tests.filter(t => t.result?.state === 'fail').length
+
+    /**
+     * Total number of passed tests.
+     *
+     * @const {number} passes
+     */
+    const passes: number = tests.filter(t => t.result?.state === 'pass').length
+
+    /**
+     * Notification message.
+     *
+     * @var {string} message
+     */
+    let message: string = ''
+
+    /**
+     * Notification title.
+     *
+     * @var {string} title
+     */
+    let title: string = ''
+
+    // get notification title and message based on number of failed tests
+    if (fails || errors.length > 0) {
+      message = dedent`
+        ${fails} of ${tests.length} tests failed
+        ${errors.length} unhandled errors
+      `
+
+      title = '\u274C Failed'
+    } else {
       /**
-       * Task skipped?
+       * Time to run all tests (in milliseconds).
        *
-       * @const {boolean} skip
+       * @const {number} time
        */
-      const skip: boolean = task.mode === 'skip'
+      const time: number = this.end - this.start
 
-      /**
-       * Printed task.
-       *
-       * @var {string} state
-       */
-      let state: string = ''
-
-      state = ' '.repeat(getNames(task).length * 2)
-      state += this.getTaskSymbol(task) + ' '
-
-      if (task.type !== 'suite') {
-        this.log(state += skip ? this.colors.blackBright(task.name) : task.name)
-      } else {
-        /**
-         * Suite title.
-         *
-         * @var {string} suite
-         */
-        let suite: string = ''
-
-        if ('filepath' in task) {
-          suite = task.file.name
-
-          if (task.file.projectName) {
-            state += this.formatProjectName(task.file.projectName, skip) + ' '
-          }
-        } else {
-          suite = task.name
-        }
-
-        suite += ` (${getTests(task).length})`
-        state += skip ? this.colors.blackBright(suite) : suite
-
-        this.log(state)
-
-        if (!skip) {
-          for (const subtask of task.tasks) void this.printTask(subtask, force)
-        }
+      message = dedent`
+        ${passes} tests passed in ${
+        time > 1000
+          ? `${(time / 1000).toFixed(2)}ms`
+          : `${Math.round(time)}ms`
       }
+      `
+
+      title = '\u2705 Passed'
     }
 
-    return void task
+    return void await promisify<Notification>(notifier.notify.bind(notifier))({
+      message,
+      sound: true,
+      timeout: 15,
+      title
+    })
   }
 }
 
-export default VerboseReporter
+export default Notifier
