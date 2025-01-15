@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "allowJs": false,
+    "checkJs": false,
+    "customConditions": ["types", "fst"]
+  },
+  "exclude": [],
+  "extends": "./tsconfig.json",
+  "files": ["vitest-env.d.mts"],
+  "include": [
+    "__fixtures__/**/*",
+    "__tests__/**/*",
+    "src/**/**.mts",
+    "vitest-env.d.mts"
+  ]
+}
