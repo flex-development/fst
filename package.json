@@ -1,7 +1,7 @@
 {
   "name": "@flex-development/fst",
   "description": "File system tree format",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "keywords": [
     "ast",
     "file-system",
