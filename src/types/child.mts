@@ -7,7 +7,7 @@ import type { AnyParent } from '@flex-development/fst'
 import type { Children } from '@flex-development/unist-util-types'
 
 /**
- * Union of [*child*][child] nodes.
+ * Union of [*child*][child] nodes that can occur in fst.
  *
  * [child]: https://github.com/syntax-tree/unist#child
  */

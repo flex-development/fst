@@ -23,8 +23,20 @@ It implements the [**unist**][unist] spec.
   - [Where this specification fits](#where-this-specification-fits)
 - [Types](#types)
 - [Nodes (abstract)](#nodes-abstract)
+  - [`Node`](#node)
+  - [`Literal`](#literal)
+  - [`Parent`](#parent)
 - [Nodes](#nodes)
+  - [`Directory`](#directory)
+  - [`File`](#file)
+  - [`Root`](#root)
 - [Content model](#content-model)
+  - [`DirectoryContent`](#directorycontent)
+  - [`FstNode`](#fstnode)
+- [Helpers](#helpers)
+  - [`AnyNode`](#anynode)
+  - [`AnyParent`](#anyparent)
+  - [`Child`](#child)
 - [Glossary](#glossary)
 - [List of utilities](#list-of-utilities)
 - [Contribute](#contribute)
@@ -48,15 +60,150 @@ yarn add @flex-development/fst
 
 ## Nodes (abstract)
 
-**TODO**: nodes (abstract)
+### `Node`
+
+```ts
+interface Node extends unist.Node {}
+```
+
+**Node** ([**unist.Node**][unist-node]) is a syntactic unit in fst syntax trees.
+
+### `Literal`
+
+```ts
+interface Literal extends Node {
+  value: string | null | undefined
+}
+```
+
+**Literal** represents an abstract interface in fst containing the smallest possible value.
+
+### `Parent`
+
+```ts
+interface Parent extends unist.Parent {
+  children: Child[]
+}
+```
+
+**Parent** ([**unist.Parent**][unist-parent]) represents an abstract interface in fst containing other nodes (said to
+be [*children*][unist-child]).
+
+Its content is limited to [file system content](#child).
 
 ## Nodes
 
-**TODO**: nodes
+### `Directory`
+
+```ts
+interface Directory extends Parent {
+  children: DirectoryContent[]
+  data?: DirectoryData | undefined
+  name: string
+  type: 'directory'
+}
+```
+
+**Directory** ([**Parent**](#parent)) represents a parent directory or subdirectory. Its `name` is relative to its
+parent directory.
+
+**Directory** can be used in [**root**](#root) nodes, as well as other **directory** nodes. Its content model is
+[**directory**](#directorycontent).
+
+### `File`
+
+```ts
+interface File extends Literal {
+  data?: FileData | undefined
+  name: string
+  type: 'file'
+  value: string | null | undefined
+}
+```
+
+**File** ([**Literal**](#literal)) represents a file.
+
+File `name`s are relative to the parent directory. Unlike the name property of a [`ParsedPath`][parsedpath], file `name`s
+include file extensions.
+
+**File** can be used in [**directory**](#directory) and [**root**](#root) nodes. It cannot contain any children — it is
+a [*leaf*][unist-leaf].
+
+### `Root`
+
+```ts
+interface Root extends Parent {
+  children: DirectoryContent[]
+  data?: RootData | undefined
+  path: string
+  type: 'root'
+}
+```
+
+**Root** ([**Parent**](#parent)) represents the root of a file system.
+
+**Root** can be used as the [*root*][unist-root] of a [*tree*][unist-tree], never as a [*child*][unist-child]. It can
+contain [**directory content**](#directorycontent).
 
 ## Content model
 
-**TODO**: content model
+### `DirectoryContent`
+
+```ts
+type DirectoryContent = Directory | File
+```
+
+**Directory** content represents files and subdirectories in a parent [**directory**](#directory).
+
+### `FstNode`
+
+```ts
+type FstNode = NodeMap[keyof NodeMap]
+```
+
+Registered fst nodes.
+
+To register custom nodes, augment `NodeMap`:
+
+```ts
+declare module '@flex-development/fst' {
+  interface NodeMap {
+    customNode: CustomNode
+  }
+}
+```
+
+## Helpers
+
+### `AnyNode`
+
+Union of nodes that can occur in fst.
+
+**See also**: [`InclusiveDescendant`][inclusivedescendant]
+
+```ts
+type AnyNode = InclusiveDescendant<Root>
+```
+
+### `AnyParent`
+
+Union of [*parents*][unist-parent] that are [*inclusive descendants*][descendant] of [`Root`](#root).
+
+**See also**: [`Parents`][parents]
+
+```ts
+type AnyParent = Parents<Root>
+```
+
+### `Child`
+
+Union of [*child*][unist-child] nodes that can occur in fst.
+
+**See also**: [`Children`][children]
+
+```ts
+type Child = Children<AnyParent>[number]
+```
 
 ## Glossary
 
@@ -80,9 +227,19 @@ Ideas for new utilities and tools can be posted in [fst/ideas][fst-ideas].
 This project has a [code of conduct](CODE_OF_CONDUCT.md). By interacting with this repository, organization, or
 community you agree to abide by its terms.
 
+[children]: https://github.com/flex-development/unist-util-types#childrent
+
+[descendant]: https://github.com/syntax-tree/unist#descendant
+
 [fst-ideas]: https://github.com/flex-development/fst/discussions/new?category=idea
 
 [fst-util-from-fs]: https://github.com/flex-development/fst-util-from-fs
+
+[inclusivedescendant]: https://github.com/flex-development/unist-util-types#inclusivedescendanttree-max-depth
+
+[parents]: https://github.com/flex-development/unist-util-types#parentstree-child
+
+[parsedpath]: https://github.com/flex-development/pathe/blob/main/src/interfaces/parsed-path.mts
 
 [postorder]: https://github.com/syntax-tree/unist#postorder
 
@@ -90,23 +247,21 @@ community you agree to abide by its terms.
 
 [typescript]: https://www.typescriptlang.org
 
-<!-- [unist-child]: https://github.com/syntax-tree/unist#child -->
-
-<!-- [unist-file]: https://github.com/syntax-tree/unist#file -->
+[unist-child]: https://github.com/syntax-tree/unist#child
 
 [unist-glossary]: https://github.com/syntax-tree/unist#glossary
 
-<!-- [unist-leaf]: https://github.com/syntax-tree/unist#leaf -->
+[unist-leaf]: https://github.com/syntax-tree/unist#leaf
 
-<!-- [unist-node]: https://github.com/syntax-tree/unist#node -->
+[unist-node]: https://github.com/syntax-tree/unist#node
 
-<!-- [unist-parent]: https://github.com/syntax-tree/unist#parent -->
+[unist-parent]: https://github.com/syntax-tree/unist#parent
 
-<!-- [unist-root]: https://github.com/syntax-tree/unist#root -->
+[unist-root]: https://github.com/syntax-tree/unist#root
 
 [unist-syntax-tree]: https://github.com/syntax-tree/unist#syntax-tree
 
-<!-- [unist-tree]: https://github.com/syntax-tree/unist#tree -->
+[unist-tree]: https://github.com/syntax-tree/unist#tree
 
 [unist-util-builder]: https://github.com/flex-development/unist-util-builder
 
