@@ -2840,16 +2840,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"acorn@npm:^8.0.0, acorn@npm:^8.11.3, acorn@npm:^8.14.0, acorn@npm:^8.5.0, acorn@npm:^8.9.0":
-  version: 8.14.0
-  resolution: "acorn@npm:8.14.0"
-  bin:
-    acorn: bin/acorn
-  checksum: 10/6df29c35556782ca9e632db461a7f97947772c6c1d5438a81f0c873a3da3a792487e83e404d1c6c25f70513e91aa18745f6eafb1fcc3a43ecd1920b21dd173d2
-  languageName: node
-  linkType: hard
-
-"acorn@npm:^8.14.1":
+"acorn@npm:^8.0.0, acorn@npm:^8.11.3, acorn@npm:^8.14.0, acorn@npm:^8.14.1, acorn@npm:^8.5.0, acorn@npm:^8.9.0":
   version: 8.14.1
   resolution: "acorn@npm:8.14.1"
   bin:
@@ -6689,27 +6680,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mdast-util-from-markdown@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "mdast-util-from-markdown@npm:2.0.0"
-  dependencies:
-    "@types/mdast": "npm:^4.0.0"
-    "@types/unist": "npm:^3.0.0"
-    decode-named-character-reference: "npm:^1.0.0"
-    devlop: "npm:^1.0.0"
-    mdast-util-to-string: "npm:^4.0.0"
-    micromark: "npm:^4.0.0"
-    micromark-util-decode-numeric-character-reference: "npm:^2.0.0"
-    micromark-util-decode-string: "npm:^2.0.0"
-    micromark-util-normalize-identifier: "npm:^2.0.0"
-    micromark-util-symbol: "npm:^2.0.0"
-    micromark-util-types: "npm:^2.0.0"
-    unist-util-stringify-position: "npm:^4.0.0"
-  checksum: 10/960e28a8ff3d989cc25a615d14e9a1d95d145b938dc08323ce44689be6dd052ece544d2acf5242cedb8ad6ccdc3ffe854989b7c2516c6e62f2fca42b6d11a2da
-  languageName: node
-  linkType: hard
-
-"mdast-util-from-markdown@npm:^2.0.2":
+"mdast-util-from-markdown@npm:^2.0.0, mdast-util-from-markdown@npm:^2.0.2":
   version: 2.0.2
   resolution: "mdast-util-from-markdown@npm:2.0.2"
   dependencies:
@@ -9360,17 +9331,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"remark-mdx@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "remark-mdx@npm:3.0.0"
-  dependencies:
-    mdast-util-mdx: "npm:^3.0.0"
-    micromark-extension-mdxjs: "npm:^3.0.0"
-  checksum: 10/678e868f6bedc597881ee99e196270b342a1950d330a2102d2303e8cf00f65f69d9692465b1609265c5635f5a28b616ad0fe49c930d48ff3323abc4c4e397853
-  languageName: node
-  linkType: hard
-
-"remark-mdx@npm:^3.1.0":
+"remark-mdx@npm:^3.0.0, remark-mdx@npm:^3.1.0":
   version: 3.1.0
   resolution: "remark-mdx@npm:3.1.0"
   dependencies:
@@ -10390,14 +10351,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:2.6.2, tslib@npm:^2.1.0, tslib@npm:^2.3.1, tslib@npm:^2.6.2":
+"tslib@npm:2.6.2":
   version: 2.6.2
   resolution: "tslib@npm:2.6.2"
   checksum: 10/bd26c22d36736513980091a1e356378e8b662ded04204453d353a7f34a4c21ed0afc59b5f90719d4ba756e581a162ecbf93118dc9c6be5acf70aa309188166ca
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.8.1":
+"tslib@npm:^2.1.0, tslib@npm:^2.3.1, tslib@npm:^2.6.2, tslib@npm:^2.8.1":
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
   checksum: 10/3e2e043d5c2316461cb54e5c7fe02c30ef6dccb3384717ca22ae5c6b5bc95232a6241df19c622d9c73b809bea33b187f6dbc73030963e29950c2141bc32a79f7
