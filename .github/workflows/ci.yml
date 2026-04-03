@@ -100,7 +100,7 @@ jobs:
         run: echo "result=$(jq .devDependencies.typescript package.json -r)" >>$GITHUB_OUTPUT
       - id: typecheck-files
         name: Check for typecheck files
-        uses: andstor/file-existence-action@v3.0.0
+        uses: andstor/file-existence-action@v3.1.0
         with:
           files: 'src/**/__tests__/*.spec-d.mts'
   commitlint:
